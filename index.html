@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>व्यवसाय हिसाब किताब</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+input, select, button {
+    padding: 10px;
+    margin: 5px;
+}
+
+button {
+    background: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+.summary {
+    margin-top: 20px;
+    font-size: 18px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>व्यवसाय हिसाब किताब</h1>
+
+    <select id="type">
+        <option value="income">आम्दानी</option>
+        <option value="expense">खर्च</option>
+    </select>
+
+    <input type="text" id="description" placeholder="विवरण">
+    <input type="number" id="amount" placeholder="रकम">
+
+    <button onclick="addRecord()">थप्नुहोस्</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>प्रकार</th>
+                <th>विवरण</th>
+                <th>रकम</th>
+            </tr>
+        </thead>
+        <tbody id="records"></tbody>
+    </table>
+
+    <div class="summary">
+        <p>कुल आम्दानी: Rs. <span id="income">0</span></p>
+        <p>कुल खर्च: Rs. <span id="expense">0</span></p>
+        <p><strong>बाँकी रकम: Rs. <span id="balance">0</span></strong></p>
+    </div>
+</div>
+
+<script>
+let totalIncome = 0;
+let totalExpense = 0;
+
+function addRecord() {
+    const type = document.getElementById("type").value;
+    const description = document.getElementById("description").value;
+    const amount = Number(document.getElementById("amount").value);
+
+    if (!description || amount <= 0) {
+        alert("सही विवरण र रकम हाल्नुहोस्");
+        return;
+    }
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${type === 'income' ? 'आम्दानी' : 'खर्च'}</td>
+        <td>${description}</td>
+        <td>Rs. ${amount}</td>
+    `;
+
+    document.getElementById("records").appendChild(row);
+
+    if (type === "income") {
+        totalIncome += amount;
+    } else {
+        totalExpense += amount;
+    }
+
+    document.getElementById("income").innerText = totalIncome;
+    document.getElementById("expense").innerText = totalExpense;
+    document.getElementById("balance").innerText = totalIncome - totalExpense;
+
+    document.getElementById("description").value = "";
+    document.getElementById("amount").value = "";
+}
+</script>
+
+</body>
+</html>
