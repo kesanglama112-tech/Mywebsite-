@@ -1,0 +1,180 @@
+
+यदि तपाईं GitHub Pages मा आफ्नो वित्तीय वेबसाइट बनाउँदै हुनुहुन्छ भने, Firebase प्रयोग गरेर:
+
+Login/Signup
+Password Reset (ईमेलबाट)
+Profile Photo Upload
+User Data Save/Recover
+Account Delete
+
+जस्ता सुविधा थप्न सकिन्छ।
+
+तपाईंको वेबसाइटको HTML/CSS/JavaScript कोड छ भने पठाउनुहोस्, म Firebase Authentication र Database जोड्ने पूरा कोड तयार गरिदिन्छु।
+
+हुन्छ मोबाइल नम्बर राखेर ओटिपी पठाउने पहिले मैले भनेको जस्तो दामी कोड तयारी गरिदिनु न
+
+हुन्छ। Firebase प्रयोग गरेर मोबाइल नम्बरमा OTP पठाउने, प्रोफाइल फोटो राख्ने, डेटा Save/Recover गर्ने, Edit/Delete गर्ने, Login/Signup सहितको आधुनिक वेबसाइट बनाउन सकिन्छ।
+
+तर यस्तो पूरा प्रोजेक्टको कोड तयार गर्नुअघि मलाई यी कुरा चाहिन्छ:
+
+वेबसाइटको नाम के राख्ने?
+कुन भाषा चाहिन्छ?
+नेपाली
+English
+दुवै
+कुन फिचर चाहिन्छ?
+OTP Login (मोबाइल नम्बर)
+Email Login
+Profile Photo Upload
+Personal Finance/खर्च आम्दानी हिसाब
+Data Delete
+Password Reset
+Dark Mode
+Dashboard
+Report/Chart
+वेबसाइट GitHub Pages मा राख्ने हो कि Hosting (Firebase Hosting) मा?
+
+ध्यान दिनुहोस्: Firebase OTP Login चलाउन Firebase Project मा Billing (Blaze Plan) आवश्यक पर्न सक्छ। यदि निःशुल्क राख्न चाहनुहुन्छ भने
+
+ठिक छ 👍 मैले तपाईंको लागि “केसङ कृषी सेवा” (Kesang Krishi Seva) को लागि एउटा Firebase Email Login + नेपाली/English lan
+
+Email/Password Login (Firebase Auth)
+Signup / Login
+User Dashboard
+नेपाली + English भाषा switch
+Profile photo upload (Firebase Storage)
+User data save (Firestore)
+Logout
+🔥 1. पहिले Firebase Setup (जरुरी)
+
+Firebase Console खोल्नुहोस्:
+Firebase Console
+
+Enable गर्नुहोस्:
+
+Authentication → Email/Password ON
+Firestore Database → Create
+Storage → Enable
+💻 2. पूरा कोड (एकै file: index.html)
+<!DOCTYPE html>
+<html>
+<head>
+  <title>केसङ कृषी सेवा</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+
+  <style>
+    body { font-family: Arial; background:#f2f2f2; text-align:center; }
+    .box { background:white; padding:20px; margin:50px auto; width:300px; border-radius:10px; }
+    button { padding:10px; margin-top:10px; width:100%; }
+    input { width:100%; padding:10px; margin:5px 0; }
+  </style>
+</head>
+
+<body>
+
+<h2 id="title">केसङ कृषी सेवा</h2>
+
+<button onclick="setLang('ne')">नेपाली</button>
+<button onclick="setLang('en')">English</button>
+
+<div class="box">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="signup()">Signup</button>
+  <button onclick="login()">Login</button>
+</div>
+
+<div class="box" id="dashboard" style="display:none;">
+  <h3 id="welcome"></h3>
+
+  <input type="file" onchange="uploadPic(event)">
+  <img id="pic" width="100">
+
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// Language
+let lang = "ne";
+
+function setLang(l){
+  lang = l;
+  document.getElementById("title").innerText =
+    l === "ne" ? "केसङ कृषी सेवा" : "Kesang Agriculture Service";
+
+  document.getElementById("email").placeholder =
+    l === "ne" ? "इमेल" : "Email";
+
+  document.getElementById("password").placeholder =
+    l === "ne" ? "पासवर्ड" : "Password";
+}
+
+// Signup
+function signup(){
+  auth.createUserWithEmailAndPassword(
+    email.value, password.value
+  ).then(user=>{
+    alert(lang==="ne"?"खाता बन्यो":"Account created");
+  });
+}
+
+// Login
+function login(){
+  auth.signInWithEmailAndPassword(
+    email.value, password.value
+  ).then(user=>{
+    showDashboard(user.user);
+  });
+}
+
+// Dashboard
+function showDashboard(user){
+  document.querySelector(".box").style.display="none";
+  document.getElementById("dashboard").style.display="block";
+
+  document.getElementById("welcome").innerText =
+    (lang==="ne"?"स्वागत छ ":"Welcome ") + user.email;
+}
+
+// Upload Photo
+function uploadPic(e){
+  let file = e.target.files[0];
+  let ref = storage.ref("profile/"+auth.currentUser.uid);
+  ref.put(file).then(()=>{
+    ref.getDownloadURL().then(url=>{
+      document.getElementById("pic").src = url;
+      db.collection("users").doc(auth.currentUser.uid).set({
+        photo:url
+      });
+    });
+  });
+}
+
+// Logout
+function logout(){
+  auth.signOut().then(()=>{
+    location.reload();
+  });
+}
+</script>
+
+</body>
+</html>
+⚡ 3. यसमा के थप्न सकिन्छ (तपाईं
